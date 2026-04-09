@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cripto Brasil Intel v10</title>
+  <style>
+    :root {
+      --bg: #08111f;
+      --panel: #101a2b;
+      --panel-2: #0d1524;
+      --line: rgba(255,255,255,.08);
+      --text: #edf3ff;
+      --muted: #9fb1d1;
+      --accent: #4da3ff;
+      --good: #2cc88a;
+      --bad: #ff6a6a;
+      --warn: #ffbe55;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #07101d 0%, #0c1524 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .wrap { max-width: 1380px; margin: 0 auto; padding: 24px; }
+    .topbar {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 16px;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+    .hero, .config, .card, .panel {
+      background: rgba(13, 21, 36, .95);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.18);
+    }
+    .hero { padding: 24px; }
+    .hero h1 { margin: 0 0 10px; font-size: 30px; }
+    .hero p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .badge {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .config { padding: 18px; display: grid; gap: 12px; }
+    label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 6px; }
+    input, button, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #09111d;
+      color: var(--text);
+      padding: 12px 14px;
+      font: inherit;
+    }
+    button {
+      cursor: pointer;
+      background: linear-gradient(180deg, #2389ff, #0b66d4);
+      border: none;
+      font-weight: 700;
+    }
+    button.secondary {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line);
+      font-weight: 600;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .card { padding: 18px; }
+    .kpi { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .big { font-size: 30px; font-weight: 800; margin-top: 8px; }
+    .small { color: var(--muted); font-size: 13px; margin-top: 6px; }
+    .main {
+      display: grid;
+      grid-template-columns: 1.6fr .9fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .panel { overflow: hidden; }
+    .panel-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .panel-header h2 { margin: 0; font-size: 18px; }
+    .panel-body { padding: 16px 18px; }
+    .article-list, .queue-list { display: grid; gap: 12px; }
+    .article-item, .queue-item {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,.02);
+    }
+    .article-meta, .queue-meta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .article-title { font-size: 18px; font-weight: 700; line-height: 1.35; margin-bottom: 8px; }
+    .article-desc { color: var(--muted); font-size: 14px; line-height: 1.55; margin-bottom: 12px; }
+    .article-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 999px;
+      font-size: 11px; border: 1px solid var(--line); color: var(--muted);
+    }
+    .score { color: var(--accent); font-weight: 700; }
+    .good { color: var(--good); }
+    .bad { color: var(--bad); }
+    .context-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .context-box {
+      background: rgba(255,255,255,.03); border: 1px solid var(--line); border-radius: 14px; padding: 14px;
+    }
+    .context-box strong { display: block; font-size: 22px; margin-top: 6px; }
+    .footer-note { margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .editorial {
+      position: fixed; inset: 0; background: rgba(0,0,0,.62); display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .editorial.open { display: flex; }
+    .editorial-panel {
+      width: min(980px, 96vw); max-height: 92vh; overflow: auto; background: #0b1321; border: 1px solid var(--line); border-radius: 22px;
+      box-shadow: 0 25px 100px rgba(0,0,0,.45); padding: 24px;
+    }
+    .slides { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+    .slide {
+      border: 1px solid var(--line); border-radius: 16px; padding: 14px; background: rgba(255,255,255,.025);
+    }
+    .row { display: flex; gap: 10px; }
+    .row > * { flex: 1; }
+    .muted { color: var(--muted); }
+    a { color: #7cb9ff; text-decoration: none; }
+    @media (max-width: 1080px) {
+      .topbar, .main, .grid-4, .context-grid, .slides { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="topbar">
+      <div class="hero">
+        <h1>Cripto Brasil Intel v10</h1>
+        <p>Refatoração pragmática para transformar o projeto em uma base menos caótica e mais operável. O dashboard agora consome a API real, mostra o estado do backend, gera editorial por artigo e trabalha com fila persistida.</p>
+        <div class="badges">
+          <span class="badge">RSS + contexto de mercado</span>
+          <span class="badge">fila persistida em JSON</span>
+          <span class="badge">editorial template-first</span>
+          <span class="badge">frontend limpo e auditável</span>
+        </div>
+      </div>
+      <div class="config">
+        <div>
+          <label for="backendUrl">URL do backend</label>
+          <input id="backendUrl" value="http://localhost:8000">
+        </div>
+        <div class="row">
+          <button id="saveBackend">Conectar backend</button>
+          <button class="secondary" id="refreshData">Atualizar agora</button>
+        </div>
+        <div>
+          <label for="filterCategory">Filtrar categoria</label>
+          <select id="filterCategory">
+            <option value="all">Todas</option>
+            <option value="cripto">Cripto</option>
+            <option value="macro">Macro</option>
+            <option value="geo">Geo / Regulação</option>
+            <option value="onchain">On-chain</option>
+          </select>
+        </div>
+        <div class="small" id="statusText">Aguardando conexão com o backend.</div>
+      </div>
+    </section>
+
+    <section class="grid-4">
+      <div class="card"><div class="kpi">Status</div><div class="big" id="healthStatus">—</div><div class="small" id="healthMeta">Sem dados</div></div>
+      <div class="card"><div class="kpi">Artigos cacheados</div><div class="big" id="articlesCount">0</div><div class="small" id="articlesMeta">Sem atualização</div></div>
+      <div class="card"><div class="kpi">Fontes ativas</div><div class="big" id="sourcesCount">0</div><div class="small">registry vindo do backend</div></div>
+      <div class="card"><div class="kpi">Fila editorial</div><div class="big" id="queueCount">0</div><div class="small">aprovados e rejeitados persistidos</div></div>
+    </section>
+
+    <section class="main">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Feed editorial</h2>
+          <span class="muted" id="feedMeta">—</span>
+        </div>
+        <div class="panel-body">
+          <div class="article-list" id="articleList"></div>
+        </div>
+      </div>
+
+      <div style="display:grid; gap:16px;">
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Contexto de mercado</h2>
+          </div>
+          <div class="panel-body">
+            <div class="context-grid">
+              <div class="context-box"><span class="muted">BTC</span><strong id="btcPrice">—</strong><span class="muted" id="btcChange">—</span></div>
+              <div class="context-box"><span class="muted">ETH</span><strong id="ethPrice">—</strong><span class="muted">spot</span></div>
+              <div class="context-box"><span class="muted">Fear &amp; Greed</span><strong id="fearGreed">—</strong><span class="muted" id="fearGreedLabel">—</span></div>
+              <div class="context-box"><span class="muted">Dominância BTC</span><strong id="btcDom">—</strong><span class="muted">participação de mercado</span></div>
+            </div>
+            <div class="footer-note">Sem teatrinho: esta versão mostra só o que a API realmente devolve. Nada de badge “IA mágica” quando a camada está degradada.</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Fila editorial</h2>
+          </div>
+          <div class="panel-body">
+            <div class="queue-list" id="queueList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="editorial" id="editorialModal">
+    <div class="editorial-panel">
+      <div class="row" style="align-items:flex-start; margin-bottom: 14px;">
+        <div>
+          <div class="muted">Pacote editorial</div>
+          <h2 id="editorialTitle" style="margin:8px 0 6px;"></h2>
+          <div class="muted" id="editorialMeta"></div>
+        </div>
+        <div style="max-width:180px;">
+          <button class="secondary" id="closeEditorial">Fechar</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="card" style="padding:16px; background: rgba(255,255,255,.02);">
+          <div class="kpi">Hook</div>
+          <div id="editorialHook" style="font-size:22px; font-weight:800; line-height:1.35; margin-top:10px;"></div>
+        </div>
+        <div class="card" style="padding:16px; background: rgba(255,255,255,.02);">
+          <div class="kpi">CTA</div>
+          <div id="editorialCTA" style="font-size:18px; font-weight:700; line-height:1.45; margin-top:10px;"></div>
+        </div>
+      </div>
+      <div class="card" style="padding:16px; background: rgba(255,255,255,.02); margin-top:14px;">
+        <div class="kpi">Resumo</div>
+        <p id="editorialSummary" style="line-height:1.7;"></p>
+        <div class="kpi">Legenda</div>
+        <p id="editorialCaption" style="white-space:pre-wrap; line-height:1.7;"></p>
+      </div>
+      <div class="slides" id="slidesContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      backendUrl: localStorage.getItem('cbi_backend_url') || 'http://localhost:8000',
+      articles: [],
+      queue: [],
+      context: null,
+      health: null,
+      sources: [],
+    };
+
+    const el = (id) => document.getElementById(id);
+    el('backendUrl').value = state.backendUrl;
+
+    function fmtUsd(value) {
+      return value ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value) : '—';
+    }
+
+    function fmtDate(value) {
+      return value ? new Date(value).toLocaleString('pt-BR') : '—';
+    }
+
+    async function api(path, options = {}) {
+      const response = await fetch(`${state.backendUrl}${path}`, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options,
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    }
+
+    async function loadAll(refresh = false) {
+      try {
+        el('statusText').textContent = 'Carregando backend…';
+        const [health, news, queue, context, sources] = await Promise.all([
+          api('/api/health'),
+          api(`/api/news?limit=24${refresh ? '&refresh=true' : ''}`),
+          api('/api/queue'),
+          api('/api/context'),
+          api('/api/sources'),
+        ]);
+        state.health = health;
+        state.articles = news.articles || [];
+        state.queue = queue.queue || [];
+        state.context = context;
+        state.sources = sources.sources || [];
+        render();
+        el('statusText').textContent = 'Backend conectado e dados atualizados.';
+      } catch (error) {
+        console.error(error);
+        el('statusText').textContent = 'Falha ao buscar backend. Verifique a URL e se o servidor está no ar.';
+      }
+    }
+
+    function renderKpis() {
+      el('healthStatus').textContent = state.health?.ok ? 'OK' : 'ERRO';
+      el('healthMeta').textContent = state.health ? `cache age: ${state.health.cache_age_seconds ?? '—'}s` : 'sem resposta';
+      el('articlesCount').textContent = state.articles.length;
+      el('articlesMeta').textContent = state.health?.updated_at ? `última leitura: ${fmtDate(state.health.updated_at)}` : '—';
+      el('sourcesCount').textContent = state.sources.length;
+      el('queueCount').textContent = state.queue.length;
+      el('feedMeta').textContent = `${state.articles.length} artigos prontos para triagem`;
+    }
+
+    function renderContext() {
+      const context = state.context || {};
+      el('btcPrice').textContent = fmtUsd(context.btc_price_usd);
+      el('btcChange').textContent = typeof context.btc_change_24h === 'number' ? `${context.btc_change_24h.toFixed(2)}% em 24h` : '—';
+      el('ethPrice').textContent = fmtUsd(context.eth_price_usd);
+      el('fearGreed').textContent = context.fear_greed ?? '—';
+      el('fearGreedLabel').textContent = context.fear_greed_label || '—';
+      el('btcDom').textContent = typeof context.btc_dominance === 'number' ? `${context.btc_dominance.toFixed(1)}%` : '—';
+    }
+
+    function filteredArticles() {
+      const category = el('filterCategory').value;
+      if (category === 'all') return state.articles;
+      return state.articles.filter((article) => article.category === category);
+    }
+
+    function renderArticles() {
+      const list = el('articleList');
+      list.innerHTML = '';
+      const articles = filteredArticles();
+      if (!articles.length) {
+        list.innerHTML = '<div class="muted">Nenhum artigo encontrado para o filtro atual.</div>';
+        return;
+      }
+
+      articles.forEach((article) => {
+        const card = document.createElement('div');
+        card.className = 'article-item';
+        const sentimentClass = article.sentiment === 'positivo' ? 'good' : article.sentiment === 'negativo' ? 'bad' : '';
+        card.innerHTML = `
+          <div class="article-meta">
+            <span class="chip">${article.source_name}</span>
+            <span class="chip">${article.category}</span>
+            <span class="chip score">score ${article.score}</span>
+            <span class="chip ${sentimentClass}">${article.sentiment}</span>
+            <span class="chip">${fmtDate(article.published_at)}</span>
+          </div>
+          <div class="article-title">${article.title}</div>
+          <div class="article-desc">${article.description || article.why_it_matters}</div>
+          <div class="article-desc"><strong>Por que importa:</strong> ${article.why_it_matters}</div>
+          <div class="article-actions">
+            <button data-editorial="${article.id}">Ver editorial</button>
+            <button class="secondary" data-approve="${article.id}">Aprovar fila</button>
+            <a class="chip" href="${article.link}" target="_blank" rel="noreferrer">Abrir fonte</a>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function renderQueue() {
+      const list = el('queueList');
+      list.innerHTML = '';
+      if (!state.queue.length) {
+        list.innerHTML = '<div class="muted">Fila vazia. Aprove algumas pautas.</div>';
+        return;
+      }
+      state.queue.forEach((item) => {
+        const node = document.createElement('div');
+        node.className = 'queue-item';
+        node.innerHTML = `
+          <div class="queue-meta">
+            <span class="chip">${item.status}</span>
+            <span class="chip">${item.source_name}</span>
+            <span class="chip">${item.scheduled_for ? fmtDate(item.scheduled_for) : 'sem agendamento'}</span>
+          </div>
+          <div style="font-weight:700; line-height:1.45; margin-bottom:6px;">${item.title}</div>
+          <div class="muted" style="font-size:13px; line-height:1.5;">${item.notes || 'sem observações'}</div>
+        `;
+        list.appendChild(node);
+      });
+    }
+
+    function render() {
+      renderKpis();
+      renderContext();
+      renderArticles();
+      renderQueue();
+    }
+
+    async function openEditorial(articleId) {
+      const payload = await api(`/api/editorial/${articleId}`);
+      el('editorialTitle').textContent = `Pacote ${payload.article_id}`;
+      el('editorialMeta').textContent = `gerado em ${fmtDate(payload.generated_at)} · modo ${payload.mode}`;
+      el('editorialHook').textContent = payload.hook;
+      el('editorialCTA').textContent = payload.call_to_action;
+      el('editorialSummary').textContent = payload.summary;
+      el('editorialCaption').textContent = payload.caption;
+      const slides = el('slidesContainer');
+      slides.innerHTML = '';
+      (payload.slides || []).forEach((slide, idx) => {
+        const div = document.createElement('div');
+        div.className = 'slide';
+        div.innerHTML = `<div class="kpi">Slide ${idx + 1}</div><div style="font-size:18px;font-weight:700;margin:8px 0;">${slide.title}</div><div class="muted" style="line-height:1.6;">${slide.body}</div><div class="small" style="margin-top:10px;">${slide.source || ''}</div>`;
+        slides.appendChild(div);
+      });
+      el('editorialModal').classList.add('open');
+    }
+
+    async function approve(articleId) {
+      await api('/api/queue/approve', {
+        method: 'POST',
+        body: JSON.stringify({ article_id: articleId, notes: 'aprovado pelo dashboard' })
+      });
+      await loadAll(false);
+    }
+
+    document.body.addEventListener('click', async (event) => {
+      const editorialId = event.target.getAttribute('data-editorial');
+      const approveId = event.target.getAttribute('data-approve');
+      if (editorialId) await openEditorial(editorialId);
+      if (approveId) await approve(approveId);
+    });
+
+    el('closeEditorial').addEventListener('click', () => el('editorialModal').classList.remove('open'));
+    el('editorialModal').addEventListener('click', (event) => {
+      if (event.target.id === 'editorialModal') el('editorialModal').classList.remove('open');
+    });
+    el('filterCategory').addEventListener('change', renderArticles);
+    el('saveBackend').addEventListener('click', async () => {
+      state.backendUrl = el('backendUrl').value.trim().replace(/\/$/, '');
+      localStorage.setItem('cbi_backend_url', state.backendUrl);
+      await loadAll(false);
+    });
+    el('refreshData').addEventListener('click', () => loadAll(true));
+
+    loadAll(false);
+  </script>
+</body>
+</html>
